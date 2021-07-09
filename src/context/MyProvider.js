@@ -11,7 +11,7 @@ function MyProvider({ children }) {
   };
 
   return (
-    <MyContext.Provider value={ { setSearch, filters } }>
+    <MyContext.Provider value={ { search, setSearch, filters } }>
       {children}
     </MyContext.Provider>
   );

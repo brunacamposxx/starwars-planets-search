@@ -6,6 +6,7 @@ function Table() {
   // requisito 1
   const [data, setData] = useState([]);
   const [titles, setTitles] = useState([]);
+  const [newData, setNewData] = useState([]);
 
   useEffect(() => {
     const getPlanets = async () => {
@@ -14,25 +15,38 @@ function Table() {
         delete result.residents;
       });
       setData(results);
+      setNewData(data);
       setTitles(Object.keys(results[0]));
     };
     getPlanets();
-  }, []);
+  }, [data]);
 
   // requisito 2
   const { setSearch, filters: { filterByName: { name } } } = useContext(MyContext); // pega para consumo a função criada no provider;
-
   function handleChange(event) {
     setSearch(event.target.value);
+    const filterName = data.filter((planet) => planet.name.includes(event.target.value));
+    setNewData(filterName);
+    // console.log(filterName);
   }
 
-  const [searchResults, setSearchFilter] = useState([]);
-
-  const searchFilter = ({ value }) => {
-  const filtered = results.filter(({ name }) => (
-    name.toLowerCase().includes(search)));
-  setSearchFilter(searchFilter);
-}, [searchResults]);
+  const filteredMap = (array) => (array.map((planet, index) => (
+    <tr key={ index }>
+      <td>{planet.name}</td>
+      <td>{planet.rotation_period}</td>
+      <td>{planet.orbital_period}</td>
+      <td>{planet.diameter}</td>
+      <td>{planet.climate}</td>
+      <td>{planet.gravity}</td>
+      <td>{planet.terrain}</td>
+      <td>{planet.surface_water}</td>
+      <td>{planet.population}</td>
+      <td>{planet.films}</td>
+      <td>{planet.created}</td>
+      <td>{planet.edited}</td>
+      <td>{planet.url}</td>
+    </tr>
+  )));
 
   return (
     <>
@@ -54,23 +68,7 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          {data.map((planet, index) => (
-            <tr key={ index }>
-              <td>{planet.name}</td>
-              <td>{planet.rotation_period}</td>
-              <td>{planet.orbital_period}</td>
-              <td>{planet.diameter}</td>
-              <td>{planet.climate}</td>
-              <td>{planet.gravity}</td>
-              <td>{planet.terrain}</td>
-              <td>{planet.surface_water}</td>
-              <td>{planet.population}</td>
-              <td>{planet.films}</td>
-              <td>{planet.created}</td>
-              <td>{planet.edited}</td>
-              <td>{planet.url}</td>
-            </tr>
-          ))}
+          {newData.length > 0 ? filteredMap(newData) : filteredMap(data) }
         </tbody>
       </table>
     </>
