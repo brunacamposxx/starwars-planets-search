@@ -1,12 +1,24 @@
-// import React from 'react';
-// import MyContext from './MyContext';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import MyContext from './MyContext';
 
-// function MyProvider() {
-//   return (
-//     <MyContext.Provider value={ { MyContext } }>
-//       {children}
-//     </MyContext.Provider>
-//   );
-// }
+function MyProvider({ children }) {
+  const [search, setSearch] = useState('');
+  const filters = {
+    filterByName: {
+      name: search,
+    },
+  };
 
-// export default MyProvider;
+  return (
+    <MyContext.Provider value={ { setSearch, filters } }>
+      {children}
+    </MyContext.Provider>
+  );
+}
+
+MyProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+export default MyProvider;
