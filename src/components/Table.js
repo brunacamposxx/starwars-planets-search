@@ -30,7 +30,7 @@ function Table() {
     columnFilter,
     comparisonFilter,
     valueFilter,
-    // buttonFilter,
+    buttonFilter,
     filters: { filterByName: { name } } } = useContext(MyContext); // pega para consumo a função criada no provider;
 
   function handleChange(event) {
@@ -60,25 +60,24 @@ function Table() {
 
   useEffect(() => {
     if (comparisonFilter === 'maior que') {
-      const dadosnovos = data.filter(
+      const comparationFilterData = data.filter(
         (param) => parseFloat(param[`${columnFilter}`]) > parseFloat(`${valueFilter}`),
       );
-      setNewData(dadosnovos);
+      setNewData(comparationFilterData);
     } else if (comparisonFilter === 'menor que') {
-      const dadosnovos = data.filter(
+      const comparationFilterData = data.filter(
         (param) => parseFloat(param[`${columnFilter}`]) < parseFloat(`${valueFilter}`),
       );
-      setNewData(dadosnovos);
+      setNewData(comparationFilterData);
     } else if (comparisonFilter === 'igual a') {
-      const dadosnovos = data.filter(
+      const comparationFilterData = data.filter(
         (param) => parseFloat(param[`${columnFilter}`]) === parseFloat(`${valueFilter}`),
       );
-      setNewData(dadosnovos);
+      setNewData(comparationFilterData);
     } else {
       setNewData([]);
     }
   }, [columnFilter, comparisonFilter, data, valueFilter]);
-
   console.log(newData);
 
   return (
