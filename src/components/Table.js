@@ -19,7 +19,7 @@ function Table() {
       setTitles(Object.keys(results[0]));
     };
     getPlanets();
-  }, [data]);
+  }, []); // warnning do eslint diz que devo colocar data como dependencia, mas isso cria looping. ver no plantáo!
 
   // requisito 2
   const { setColumnFilter,
@@ -35,7 +35,7 @@ function Table() {
 
   function handleChange(event) {
     setSearch(event.target.value);
-    const filterName = data.filter((planet) => planet.name.includes(event.target.value));
+    const filterName = data.filter((planet) => planet.name.includes(event.target.value)); // add toUpperCase()
     setNewData(filterName);
     // console.log(filterName);
   }
@@ -78,6 +78,8 @@ function Table() {
       setNewData([]);
     }
   }, [columnFilter, comparisonFilter, data, valueFilter]);
+
+  console.log(newData);
 
   return (
     <>
