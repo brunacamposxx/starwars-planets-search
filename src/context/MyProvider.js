@@ -4,10 +4,16 @@ import MyContext from './MyContext';
 
 function MyProvider({ children }) {
   const [search, setSearch] = useState('');
-  const [columnFilter, setColumnFilter] = useState([]); // requisito 3
-  const [comparisonFilter, setComparisonFilter] = useState([]); // requisito 3
+  const [columnFilter, setColumnFilter] = useState('population'); // requisito 3
+  const [comparisonFilter, setComparisonFilter] = useState('maior que'); // requisito 3
   const [valueFilter, setValueFilter] = useState([]); // requisito 3
-  const [buttonFilter, setButtonFilter] = useState([]); // requisito 3
+
+  const filteredByNumbers = {
+    filter: false,
+    filterNumberData: [],
+  };
+
+  const [buttonFilter, setButtonFilter] = useState(filteredByNumbers); // requisito 3
 
   const filters = {
     filterByName: {
@@ -21,6 +27,9 @@ function MyProvider({ children }) {
       },
     ],
   };
+  const details = ['population', 'orbital_period', 'diameter',
+    'rotation_period', 'surface_water'];
+  const [columnMap, setColumnMap] = useState(details);
 
   return (
     <MyContext.Provider
@@ -36,6 +45,9 @@ function MyProvider({ children }) {
         buttonFilter,
         search,
         filters,
+        columnMap,
+        setColumnMap,
+        filteredByNumbers,
       } }
     >
       {children}

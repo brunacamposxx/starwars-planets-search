@@ -6,7 +6,7 @@ function Table() {
   // requisito 1
   const [data, setData] = useState([]);
   const [titles, setTitles] = useState([]);
-  const [newData, setNewData] = useState([]); // requisito 2
+  const [newData, setNewData] = useState(undefined); // requisito 2
 
   useEffect(() => {
     const getPlanets = async () => {
@@ -15,7 +15,7 @@ function Table() {
         delete result.residents;
       });
       setData(results);
-      setNewData(data); // requisito 2
+      // setNewData(data); // requisito 2
       setTitles(Object.keys(results[0]));
     };
     getPlanets();
@@ -31,6 +31,8 @@ function Table() {
     comparisonFilter,
     valueFilter,
     buttonFilter,
+    columnMap,
+    setColumnMap,
     filters: { filterByName: { name } } } = useContext(MyContext); // pega para consumo a função criada no provider;
 
   function handleChange(event) {
@@ -58,27 +60,71 @@ function Table() {
     </tr>
   )));
 
-  useEffect(() => {
+  const filterByNumber = () => {
     if (comparisonFilter === 'maior que') {
       const comparationFilterData = data.filter(
         (param) => parseFloat(param[`${columnFilter}`]) > parseFloat(`${valueFilter}`),
       );
       setNewData(comparationFilterData);
+      setButtonFilter({ ...buttonFilter,
+        filter: false,
+      });
     } else if (comparisonFilter === 'menor que') {
       const comparationFilterData = data.filter(
         (param) => parseFloat(param[`${columnFilter}`]) < parseFloat(`${valueFilter}`),
       );
       setNewData(comparationFilterData);
+      setButtonFilter({ ...buttonFilter,
+        filter: false,
+      });
     } else if (comparisonFilter === 'igual a') {
       const comparationFilterData = data.filter(
         (param) => parseFloat(param[`${columnFilter}`]) === parseFloat(`${valueFilter}`),
       );
       setNewData(comparationFilterData);
+      setButtonFilter({ ...buttonFilter,
+        filter: false,
+      });
     } else {
       setNewData([]);
+      setButtonFilter({ ...buttonFilter,
+        filter: false,
+      });
     }
-  }, [columnFilter, comparisonFilter, data, valueFilter]);
-  console.log(newData);
+  };
+  useEffect(() => {
+    const { filter } = buttonFilter;
+    if (filter) { filterByNumber(); }
+  });
+  const handleClick = () => {
+    const { filterNumberData } = buttonFilter;
+    const newDetails = columnMap.filter((detail) => detail !== columnFilter);
+    setColumnMap(newDetails);
+    setButtonFilter({ ...buttonFilter,
+      filter: true,
+      filterNumberData: [...filterNumberData,
+        { id: filterNumberData.length, columnFilter, comparisonFilter, valueFilter }] });
+  };
+
+  const clearFilter = (id) => {
+    const { filterNumberData } = buttonFilter;
+    const removedFilter = filterNumberData.filter((item) => item.id !== id);
+    setNewData(undefined);
+    setButtonFilter({ ...buttonFilter, filterNumberData: removedFilter });
+  };
+
+  const rendFilterButton = () => {
+    const { filterNumberData } = buttonFilter;
+    return filterNumberData.map((item) => (
+      <div key={ item.id }>
+        <p data-testid="filter">
+          { `Filtrado por ${item
+            .columnFilter} ${item.comparisonFilter} ${item.valueFilter}` }
+          <button type="button" onClick={ () => clearFilter(item.id) }>X</button>
+        </p>
+      </div>
+    ));
+  };
 
   return (
     <>
@@ -99,11 +145,7 @@ function Table() {
           onChange={ (event) => { setColumnFilter(event.target.value); } }
           data-testid="column-filter"
         >
-          <option value="population">population</option>
-          <option value="orbital_period">orbital_period</option>
-          <option value="diameter">diameter</option>
-          <option value="rotation_period">rotation_period</option>
-          <option value="surface_water">surface_water</option>
+          {columnMap.map((column) => <option key={ column }>{column}</option>)}
         </select>
         <select
           name="select"
@@ -121,11 +163,14 @@ function Table() {
         />
         <button
           type="submit"
-          onClick={ (event) => { setButtonFilter(event.target.value); } }
+          onClick={ handleClick }
           data-testid="button-filter"
         >
           Filter
         </button>
+      </div>
+      <div>
+        {rendFilterButton()}
       </div>
       <table>
         <thead>
@@ -134,7 +179,7 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          {newData.length > 0 ? filteredMap(newData) : filteredMap(data) }
+          {!newData ? filteredMap(data) : filteredMap(newData) }
         </tbody>
       </table>
     </>
