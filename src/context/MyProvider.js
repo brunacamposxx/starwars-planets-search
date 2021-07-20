@@ -15,6 +15,9 @@ function MyProvider({ children }) {
 
   const [buttonFilter, setButtonFilter] = useState(filteredByNumbers); // requisito 3
 
+  const initialOrder = { orderOn: false, columnFilter: 'name', sort: 'ASC' };
+  const [order, setOrder] = useState(initialOrder);
+
   const filters = {
     filterByName: {
       name: search,
@@ -27,9 +30,35 @@ function MyProvider({ children }) {
       },
     ],
   };
+
   const details = ['population', 'orbital_period', 'diameter',
     'rotation_period', 'surface_water'];
   const [columnMap, setColumnMap] = useState(details);
+
+  const setOrdenation = (planetA, planetB) => {
+    const { sort } = order;
+    const ONE = 1;
+    const LESS_ONE = -1;
+    if (sort === 'ASC') {
+      return (planetA > planetB) ? ONE : LESS_ONE;
+    }
+    if (sort === 'DESC') {
+      return (planetB > planetA) ? ONE : LESS_ONE;
+    }
+    return 0;
+  };
+
+  const orderPlanets = (planets) => {
+    const { columnFilter: column } = order;
+    planets.sort((planetA, planetB) => {
+      const a = (column === 'name') ? planetA[column] : parseInt(planetA[column], 10);
+      console.log(a);
+      const b = (column === 'name') ? planetB[column] : parseInt(planetB[column], 10);
+      console.log(b);
+      return setOrdenation(a, b);
+    });
+    setOrder({ ...order, orderOn: false });
+  };
 
   return (
     <MyContext.Provider
@@ -39,6 +68,8 @@ function MyProvider({ children }) {
         setValueFilter,
         setButtonFilter,
         setSearch,
+        setOrder,
+        setColumnMap,
         columnFilter,
         comparisonFilter,
         valueFilter,
@@ -46,8 +77,9 @@ function MyProvider({ children }) {
         search,
         filters,
         columnMap,
-        setColumnMap,
         filteredByNumbers,
+        order,
+        orderPlanets,
       } }
     >
       {children}

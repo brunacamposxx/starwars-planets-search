@@ -294,7 +294,7 @@ O dropdown deve ser um elemento `select` com a propriedade `data-testid='column-
 
 Adicione o atributo `data-testid` com o valor `planet-name` em todos os elementos da tabela que possuem o nome de um planeta.
 
-O que será verificado:
+O que será verificado: 
 ```
 - Verifica ordenação inicial
 - Ordena os planetas do mais populoso para o menos populoso

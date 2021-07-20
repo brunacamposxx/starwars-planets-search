@@ -1,25 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import MyContext from '../context/MyContext';
 import fetchAPI from '../services/fetchAPI';
+import Sort from './Sort';
 
 function Table() {
   // requisito 1
   const [data, setData] = useState([]);
   const [titles, setTitles] = useState([]);
   const [newData, setNewData] = useState(undefined); // requisito 2
-
-  useEffect(() => {
-    const getPlanets = async () => {
-      const results = await fetchAPI();
-      results.forEach((result) => {
-        delete result.residents;
-      });
-      setData(results);
-      // setNewData(data); // requisito 2
-      setTitles(Object.keys(results[0]));
-    };
-    getPlanets();
-  }, []); // warnning do eslint diz que devo colocar data como dependencia, mas isso cria looping. ver no plantáo!
 
   // requisito 2
   const { setColumnFilter,
@@ -33,18 +21,19 @@ function Table() {
     buttonFilter,
     columnMap,
     setColumnMap,
+    order,
+    orderPlanets,
     filters: { filterByName: { name } } } = useContext(MyContext); // pega para consumo a função criada no provider;
 
   function handleChange(event) {
     setSearch(event.target.value);
     const filterName = data.filter((planet) => planet.name.includes(event.target.value)); // add toUpperCase()
     setNewData(filterName);
-    // console.log(filterName);
   }
 
   const filteredMap = (array) => (array.map((planet, index) => (
     <tr key={ index }>
-      <td>{planet.name}</td>
+      <td data-testid="planet-name">{planet.name}</td>
       <td>{planet.rotation_period}</td>
       <td>{planet.orbital_period}</td>
       <td>{planet.diameter}</td>
@@ -92,10 +81,7 @@ function Table() {
       });
     }
   };
-  useEffect(() => {
-    const { filter } = buttonFilter;
-    if (filter) { filterByNumber(); }
-  });
+
   const handleClick = () => {
     const { filterNumberData } = buttonFilter;
     const newDetails = columnMap.filter((detail) => detail !== columnFilter);
@@ -125,6 +111,27 @@ function Table() {
       </div>
     ));
   };
+
+  useEffect(() => {
+    const getPlanets = async () => {
+      const results = await fetchAPI();
+      results.forEach((result) => {
+        delete result.residents;
+      });
+      setData(results);
+      orderPlanets(results);
+      setTitles(Object.keys(results[0]));
+    };
+    getPlanets();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const { filter } = buttonFilter;
+    const { orderOn } = order;
+    if (filter) { filterByNumber(); }
+    if (orderOn) { orderPlanets(data); }
+  });
 
   return (
     <>
@@ -168,6 +175,7 @@ function Table() {
         >
           Filter
         </button>
+        <Sort />
       </div>
       <div>
         {rendFilterButton()}
